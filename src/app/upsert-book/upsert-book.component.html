@@ -1,0 +1,73 @@
+<div class="container mt-4">
+  <h4>{{ book.BookID ? 'Update Book' : 'Add New Book' }}</h4>
+
+  <form (ngSubmit)="saveBook()" #bookForm="ngForm" novalidate>
+    <div class="mb-3">
+      <label class="form-label">Book Name</label>
+      <input
+        type="text"
+        class="form-control"
+        [(ngModel)]="book.BookName"
+        name="BookName"
+        required
+        #bookName="ngModel"
+        placeholder="Enter book name"
+      />
+      <div class="text-danger" *ngIf="bookName.invalid && bookName.touched">
+        Book Name is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Publication</label>
+      <ng-select
+        [items]="publications"
+        bindLabel="PublicationName"
+        bindValue="PublicationId"
+        [(ngModel)]="book.PublicationId"
+        name="PublicationId"
+        [clearable]="false"
+        placeholder="Select Publication"
+        required
+        #pubId="ngModel"
+      ></ng-select>
+      <div class="text-danger" *ngIf="pubId.invalid && pubId.touched">
+        Publication is required.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Department</label>
+      <ng-select
+        [items]="departments"
+        bindLabel="DepartmentName"
+        bindValue="DepartmentId"
+        [(ngModel)]="book.DepartmentId"
+        name="DepartmentId"
+        [clearable]="false"
+        placeholder="Select Department"
+        required
+        #deptId="ngModel"
+      ></ng-select>
+      <div class="text-danger" *ngIf="deptId.invalid && deptId.touched">
+        Department is required.
+      </div>
+    </div>
+
+    <div class="form-check mb-3">
+      <input
+        type="checkbox"
+        class="form-check-input"
+        id="isActive"
+        [(ngModel)]="book.IsActive"
+        name="IsActive"
+      />
+      <label class="form-check-label" for="isActive">Is Active</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary" [disabled]="bookForm.invalid">
+      {{ book.BookID ? 'Update' : 'Save' }}
+    </button>
+    <a class="btn btn-secondary ms-2" [routerLink]="['/Home']">Cancel</a>
+  </form>
+</div>

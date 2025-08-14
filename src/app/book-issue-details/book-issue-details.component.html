@@ -1,0 +1,246 @@
+<div class="container mt-4">
+  <div class="d-flex align-items-center justify-content-between">
+    <h4>Select Book Issue ID</h4>
+    <button type="button" class="btn btn-outline-primary btn-sm" (click)="startNewIssue()">
+      + New Issue
+    </button>
+  </div>
+
+  <div class="mb-3">
+    <select class="form-select" [(ngModel)]="selectedIssueId" (change)="onIssueIdChange()">
+      <option [ngValue]="null">-- Select Issue ID --</option>
+      <option *ngFor="let issue of issueIds" [ngValue]="issue.BookIssueID">
+        {{ issue.BookIssueID }}
+      </option>
+    </select>
+  </div>
+
+  <div *ngIf="issueDetails">
+    <form #issueForm="ngForm" (ngSubmit)="updateIssue(issueForm)">
+      <h5>Issue Details</h5>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label"><strong>User</strong></label>
+          <select
+            class="form-select" [(ngModel)]="issueDetails.UserID" name="userId" required >
+            <option [ngValue]="null">-- Select User --</option>
+            <option *ngFor="let u of users" [ngValue]="u.UserID">
+              {{ u.UserName }}
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label"><strong>Issue Date</strong></label>
+          <input
+            type="date" class="form-control" [(ngModel)]="issueDetails.IssueDate" name="issueDate" required />
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label"><strong>Due Date</strong></label>
+          <input
+            type="date" class="form-control" [(ngModel)]="issueDetails.DueDate" name="dueDate" required />
+        </div>
+
+        <div class="col-md-4" *ngIf="issueDetails?.CreatedOn">
+          <label class="form-label"><strong>Created On</strong></label>
+          <input
+            type="text" class="form-control" [value]="issueDetails.CreatedOn | date:'medium'" disabled />
+        </div>
+      </div>
+
+      <h5 class="mt-4 mb-2 d-flex align-items-center justify-content-between">
+        <span>Books Issued</span>
+        <button
+          type="button"
+          class="btn btn-outline-secondary btn-sm"
+          (click)="openBookPicker(bookPicker)"
+        >
+          + Add Book(s)
+        </button>
+      </h5>
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Book Name</th>
+              <th style="width: 160px;">Quantity</th>
+              <th style="width: 80px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let detail of issueDetails.BookIssueDetails; let i = index">
+              <td>{{ detail.BookName }}</td>
+              <td>
+                <input
+                  type="number"
+                  class="form-control"
+                  min="1"
+                  [(ngModel)]="detail.Quantity"
+                  name="qty{{ i }}"
+                  required
+                />
+              </td>
+              <td>
+                <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeBook(i)">
+                  Remove
+                </button>
+              </td>
+            </tr>
+            <tr *ngIf="!issueDetails.BookIssueDetails?.length">
+              <td colspan="3" class="text-muted">No books added yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-3 d-flex gap-2">
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isSaving || issueForm.invalid || !(issueDetails?.BookIssueDetails?.length) || !issueDetails?.UserID " >
+          {{ selectedIssueId ? 'Update' : 'Create' }}
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="onIssueIdChange()"
+          [disabled]="selectedIssueId == null || isSaving"
+        >
+          Reset
+        </button>
+
+        <button type="button" class="btn btn-outline-danger" (click)="cancel()" [disabled]="isSaving">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+<div class="card mt-4" *ngIf="currentIssueId()">
+  <div class="card-header d-flex justify-content-between align-items-center">
+    <strong>Support Documents</strong>
+    <div class="d-flex align-items-center gap-2">
+      <!-- <input type="file" class="form-control form-control-sm" multiple
+             (change)="onFilesSelected($event)" />
+      <button class="btn btn-sm btn-outline-primary"
+              [disabled]="!pendingFiles.length || uploading"
+              (click)="uploadSelected()">
+        {{ uploading ? 'Uploading...' : 'Upload' }}
+      </button> -->
+    </div>
+  </div>
+
+  <div class="card-body p-0">
+    <div *ngIf="uploadProgress >= 0" class="p-3">
+      <div class="progress">
+        <div class="progress-bar" role="progressbar"
+             [style.width.%]="uploadProgress" aria-valuemin="0"
+             aria-valuemax="100">
+          {{ uploadProgress }}%
+        </div>
+      </div>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-sm table-striped mb-0">
+        <thead>
+          <tr>
+            <th style="width: 40px;">#</th>
+            <th>File</th>
+            <th style="width: 160px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- <tr *ngFor="let f of supportFiles; let i = index"> -->
+            <!-- <td>{{ i + 1 }}</td>
+            <td>{{ f.FileName }}</td> -->
+            <td>
+              <!-- <a class="btn btn-outline-secondary btn-sm me-2"
+                 [href]="downloadUrl(f.FileID)" target="_blank">
+                Download
+              </a> -->
+              <!-- <button class="btn btn-outline-danger btn-sm"
+                      (click)="deleteFile(f)">
+                Delete
+              </button> -->
+            </td>
+          <!-- </tr> -->
+
+          <!-- <tr *ngIf="!supportFiles?.length"> -->
+            <td colspan="3" class="text-muted p-3">No files uploaded yet.</td>
+          <!-- </tr> -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="p-3 text-muted small" *ngIf="!currentIssueId()">
+      Save the issue first to upload documents.
+    </div>
+  </div>
+</div>
+
+
+
+<ng-template #bookPicker let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Select Books</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
+    <div class="mb-2 d-flex gap-2">
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Search books..."
+        [ngModel]="bookSearch"
+        (ngModelChange)="onSearchChange($event)"
+        name="bookSearch"
+      />
+      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="toggleAllVisible()">
+        {{ allVisibleSelected ? 'Unselect All' : 'Select All' }}
+      </button>
+    </div>
+
+    <div class="table-responsive" style="max-height: 50vh; overflow:auto;">
+      <table class="table table-sm table-hover align-middle">
+        <thead>
+          <tr>
+            <th style="width: 40px;"></th>
+            <th>Book</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let b of visibleBooks">
+            <td>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                [ngModel]="bookSelections[b.BookID]"
+                (ngModelChange)="onSelectionToggle(b, $event)"
+                [name]="'sel' + b.BookID"
+                [disabled]="isAlreadyAdded(b.BookID)"
+              />
+            </td>
+            <td>{{ b.BookName }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="visibleBooks.length === 0" class="text-muted small">
+        No books match your search.
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="addSelectedBooks(modal)">Add</button>
+  </div>
+</ng-template>
