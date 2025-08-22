@@ -15,4 +15,5 @@ export class BookIssueModel {
   ModifiedBy?: number;       
   Books: BookIssueDetailRow[];
   DeletedDetailIds?: number[]; 
+  DeletedFileIds?: number[];
 }

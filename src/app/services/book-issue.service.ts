@@ -1,73 +1,62 @@
-import { HttpClient, HttpEvent, HttpRequest } from '@angular/common/http';
+
+import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BookIssueModel, BookIssueDetailRow } from '../models/book-issue-model';
-
+import { BookIssueModel } from '../models/book-issue-model';
+import { SupportFile } from '../models/support-file.model';
 
 @Injectable({ providedIn: 'root' })
 export class BookIssueService {
   private baseUrl = 'http://localhost:62402/api/BookIssue';
+  private filesBase = 'http://localhost:62402/api/BookIssueFiles';
 
   constructor(private http: HttpClient) {}
 
-  getAllIssueIds(): Observable<{ BookIssueID: number }[]> {
+
+  saveIssueWithFiles(model: BookIssueModel, files: File[]): Observable<any> {
+  const form = new FormData();
+  form.append('model', JSON.stringify(model)); 
+  for (const f of files) form.append('files', f, f.name);
+
+  return this.http.post<any>(`${this.baseUrl}/Save`, form); 
+  }
+  
+  getAllIssueIds() {
     return this.http.get<{ BookIssueID: number }[]>(`${this.baseUrl}/GetAllBookIssueIds`);
   }
 
-  getIssueDetailsById(issueId: number): Observable<any> {
-    return this.http.get<any>(`${this.baseUrl}/GetBookIssueDetails?bookIssueId=${issueId}`);
+  getIssueDetailsById(issueId: number) {
+    return this.http.get<any>(`${this.baseUrl}/GetBookIssueDetails`, { params: { bookIssueId: String(issueId) } });
   }
 
-  getUsers(): Observable<{ UserID: number; UserName: string }[]> {
+  getUsers() {
     return this.http.get<{ UserID: number; UserName: string }[]>(`${this.baseUrl}/GetUsersList`);
   }
 
-  getBooks(): Observable<{ BookID: number; BookName: string }[]> {
+  getBooks() {
     return this.http.get<{ BookID: number; BookName: string }[]>(`${this.baseUrl}/GetBooksList`);
   }
 
-  saveIssue(model: BookIssueModel): Observable<{ BookIssueID: number }> {
-    return this.http.post<{ BookIssueID: number }>(`${this.baseUrl}/Save`, model);
+
+  getSupportFiles(bookIssueId: number) {
+    return this.http.get<SupportFile[]>(`${this.filesBase}/list`, { params: { bookIssueId: String(bookIssueId) } });
   }
 
+  deleteSupportFile(fileId: number) {
+    return this.http.delete(`${this.filesBase}/${fileId}`);
+  }
 
+  downloadUrl(fileId: number) {
+    return `${this.filesBase}/download/${fileId}`;
+  }
 }
 
-//    getSupportFiles(bookIssueId: number): Observable<SupportFile[]> {
-//     debugger;
-//     console.log("inside getSuppostFiles");
-//     return this.http.get<SupportFile[]>(`${this.baseUrl}/list?bookIssueId=${bookIssueId}`);
-//   }
-
-
-//   uploadSupportFiles(bookIssueId: number, files: File[], uploadedBy: number)
-//     : Observable<HttpEvent<any>> {
-//     const form = new FormData();
-//     // Use same key "files" for all files to match controller
-//     for (const f of files) form.append('files', f, f.name);
-
-//     const req = new HttpRequest(
-//       'POST',
-//       `${this.baseUrl}/upload?bookIssueId=${bookIssueId}&uploadedBy=${uploadedBy}`,
-//       form,
-//       { reportProgress: true }
-//     );
-//     return this.http.request(req);
-//   }
-
-
-//   deleteSupportFile(fileId: number, modifiedBy: number) {
-//     return this.http.delete(`${this.baseUrl}/${fileId}?modifiedBy=${modifiedBy}`);
-//   }
-// }
-
 // export interface SupportFile {
-//   FileID?: number;
-//   BookIssueID?: number;
+//   FileID: number;
+//   BookIssueID: number;
 //   FileName: string;
-//   FilePath: string;
+//   FilePath?: string;
 //   UploadedBy?: number;
 //   UploadedOn?: string;
 //   IsActive?: boolean;
 // }
-

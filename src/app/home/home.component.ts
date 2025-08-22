@@ -55,10 +55,10 @@ export class HomeComponent {
           next: (vendors: any[]) => {
             this.vendors = vendors ?? [];
 
-            const storedFilters = sessionStorage.getItem('bookFilters');
+            const storedFilters = localStorage.getItem('bookFilters');
             if (storedFilters) {
               this.filters = JSON.parse(storedFilters);
-              sessionStorage.removeItem('bookFilters');
+              localStorage.removeItem('bookFilters');
             }
 
             this.GetBookList();
@@ -127,13 +127,13 @@ export class HomeComponent {
 
   onEditBook(bookId: number) {
     console.log('Edit button clicked! Book ID:', bookId);
-    console.log('Saving filters to sessionStorage:', this.filters);
-    sessionStorage.setItem('bookFilters', JSON.stringify(this.filters));
+    console.log('Saving filters to localStorage:', this.filters);
+    localStorage.setItem('bookFilters', JSON.stringify(this.filters));
     this.router.navigate(['/book/edit', bookId]);
   }
 
   onAddBook() {
-    sessionStorage.setItem('/bookFilters', JSON.stringify(this.filters));
+    localStorage.setItem('/bookFilters', JSON.stringify(this.filters));
     this.router.navigate(['/book/add']);
   }
 

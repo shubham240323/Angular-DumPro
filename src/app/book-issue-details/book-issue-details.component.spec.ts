@@ -20,4 +20,5 @@ describe('BookIssueDetailsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  
 });
