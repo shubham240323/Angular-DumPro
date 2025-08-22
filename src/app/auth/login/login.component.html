@@ -1,0 +1,49 @@
+<div class="container mt-5" style="max-width: 420px">
+  <h3 class="mb-3">Sign in</h3>
+
+  <form #f="ngForm" (ngSubmit)="submit(f)">
+    
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input
+        id="username"
+        name="username"
+        class="form-control"
+        [(ngModel)]="username"
+        required
+        autocomplete="username"
+        (keydown.enter)="submit(f)"
+      />
+      <small class="text-danger" *ngIf="f.submitted && !username">Username is required</small>
+    </div>
+
+    
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <div class="input-group">
+        <input
+          id="password"
+          name="password"
+          class="form-control"
+          [type]="showPassword ? 'text' : 'password'"
+          [(ngModel)]="password"
+          required
+          autocomplete="current-password"
+          (keydown.enter)="submit(f)"
+        />
+        <button type="button" class="btn btn-outline-secondary" (click)="toggleShow()">
+          {{ showPassword ? 'Hide' : 'Show' }}
+        </button>
+      </div>
+      <small class="text-danger" *ngIf="f.submitted && !password">Password is required</small>
+    </div>
+
+    
+    <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+
+    
+    <button class="btn btn-primary w-100" [disabled]="loading || f.invalid">
+      {{ loading ? 'Signing in…' : 'Sign in' }}
+    </button>
+  </form>
+</div>
